@@ -25,7 +25,7 @@ Sends email to:
 - Prospect (confirmation)
 - Internal attorney (with resume attached)
 
-Admin capabilities:
+Admin(attorney) capabilities:
 
 - View all leads (`/leads`)
 - Mark lead as REACHED_OUT (`/leads/{id}/mark-reached`)
@@ -110,18 +110,48 @@ uvicorn main:app --reload
 
 - **Type**: `form-data`
 - Fields: `first_name`, `last_name`, `email`, `resume (file)`
-- Public
+- Public (No Auth) 
+
+Create a New Lead
+- Description: Creates a new lead entry.
+- Request:
+  - Accepts form data: `first_name`, `last_name`, `email`, and a resume file.
+- Actions:
+  - Saves the resume to the `uploads/` directory.
+  - Stores the lead entry in the database.
+  - Sends:
+    - A confirmation email to the lead.
+    - A notification email with the resume to the attorney (configured via `.env` → `ATTORNEY_EMAIL`).
+- Response : Returns the newly created lead object.
 
 ### `GET /leads`
 
 - Basic Auth protected (`admin:secret123`)
 - Returns all leads
 
+Retrieve All Leads
+
+- Description: Fetches all lead records (authentication required).
+- Request:
+  - Validates credentials using HTTP Basic Auth.
+- Actions:
+  - Queries all lead records from the database.
+- Response: Returns a list of all leads.
+
+
 ### `POST /leads/{id}/mark-reached`
 
 - Basic Auth protected
 - Marks the status as `REACHED_OUT`
 
+Mark Lead as Contacted
+
+- Description: Updates the status of a lead to indicate contact has been made (authentication required).
+- Request:
+  - Verifies the existence of the lead with the specified `lead_id`.
+- Actions:
+  - Updates the `status` field to `REACHED_OUT`.
+- Response: Returns the updated lead object.
 ---
 
 ## Clean Script
